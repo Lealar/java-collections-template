@@ -4,7 +4,6 @@ import com.epam.izh.rd.online.helper.Direction;
 
 import java.util.*;
 
-import static java.util.Collections.*;
 
 /**
  * Совет:
@@ -23,7 +22,7 @@ public class SimpleTextStatisticsAnalyzer implements TextStatisticsAnalyzer {
      */
     @Override
     public int countSumLengthOfWords(String text) {
-        return 0;
+        return text.replaceAll("\\W+", "").length();
     }
 
     /**
@@ -34,7 +33,7 @@ public class SimpleTextStatisticsAnalyzer implements TextStatisticsAnalyzer {
      */
     @Override
     public int countNumberOfWords(String text) {
-        return 0;
+        return getWords(text).size();
     }
 
     /**
@@ -44,7 +43,7 @@ public class SimpleTextStatisticsAnalyzer implements TextStatisticsAnalyzer {
      */
     @Override
     public int countNumberOfUniqueWords(String text) {
-        return 0;
+        return new HashSet<>(getWords(text)).size();
     }
 
     /**
@@ -57,7 +56,7 @@ public class SimpleTextStatisticsAnalyzer implements TextStatisticsAnalyzer {
      */
     @Override
     public List<String> getWords(String text) {
-        return emptyList();
+        return Arrays.asList(text.split("\\W+"));
     }
 
     /**
@@ -70,7 +69,7 @@ public class SimpleTextStatisticsAnalyzer implements TextStatisticsAnalyzer {
      */
     @Override
     public Set<String> getUniqueWords(String text) {
-        return emptySet();
+        return new HashSet<>(getWords(text));
     }
 
     /**
@@ -82,7 +81,11 @@ public class SimpleTextStatisticsAnalyzer implements TextStatisticsAnalyzer {
      */
     @Override
     public Map<String, Integer> countNumberOfWordsRepetitions(String text) {
-        return emptyMap();
+        Map<String, Integer> numberOfRepeatedWords = new HashMap<>();
+        for (String word : getWords(text)) {
+            numberOfRepeatedWords.merge(word, 1, (a, b) -> b = (numberOfRepeatedWords.get(word) + 1));
+        }
+        return numberOfRepeatedWords;
     }
 
     /**
@@ -95,6 +98,28 @@ public class SimpleTextStatisticsAnalyzer implements TextStatisticsAnalyzer {
      */
     @Override
     public List<String> sortWordsByLength(String text, Direction direction) {
-        return emptyList();
+        List<String> wordsForSorting = getWords(text);
+
+        class ASCdirection implements Comparator<String> {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.length() - o2.length();
+            }
+        }
+
+
+        class DESCdirection implements Comparator<String> {
+            @Override
+            public int compare(String o1, String o2) {
+                return o2.length() - o1.length();
+            }
+        }
+
+        if (direction.equals(Direction.ASC)) {
+            wordsForSorting.sort(new ASCdirection());
+        } else {
+            wordsForSorting.sort(new DESCdirection());
+        }
+        return wordsForSorting;
     }
 }
